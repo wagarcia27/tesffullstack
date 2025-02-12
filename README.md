@@ -1,360 +1,502 @@
-# Backend del Proyecto Fullstack
+# Frontend del Proyecto Fullstack
 
 ## Descripción
 
-Este proyecto es una aplicación backend desarrollada con Spring Boot que permite capturar el nombre, apellido, fecha de nacimiento, puesto y sueldo de una persona. La aplicación proporciona una API REST para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los datos de las personas.
+Este proyecto es una aplicación frontend desarrollada con React que permite capturar el nombre, apellido, fecha de nacimiento, puesto y sueldo de una persona. La aplicación proporciona una interfaz de usuario para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los datos de las personas.
 
 ## Requisitos
 
-- Java 17
-- Maven
-- MySQL
+- Node.js (versión 18.19.0 o superior)
+- npm (versión 6.14.4 o superior)
 
 ## Configuración del Proyecto
 
 ### Clonar el Repositorio
 
 1. **Clonar el Repositorio:**
-   ```bash
-   git clone https://github.com/tonysoft2018/tesffullstack
-   cd tesffullstack
 
-2. **Crear Ramas:**
-git checkout -b meza_backend
-git checkout -b meza_frontend
-git checkout -b meza_bd
+ ```bash
+   git clone https://github.com/tu_usuario/frontend_meza
+   cd frontend_meza
+```
 
-### Configurar el Backend con Spring Boot
+    ## Instalar Dependencias
 
-1. **Configurar application.properties:**
+1. **Instalar las Dependencias del Proyecto:**
 
-Abre el archivo src/main/resources/application.properties y configura la conexión a la base de datos:
+```bash
+   npm install
+   ```
 
+   ### Configurar el Servicio PersonService
 
-spring.datasource.url=jdbc:mysql://<IP_de_tu_PC_personal>:3306/bd_meza?allowPublicKeyRetrieval=true&useSSL=false
-spring.datasource.username=conexion
-spring.datasource.password=password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+   1. **Configurar la URL del Backend:**
 
-Reemplaza <IP_de_tu_PC_personal> con la dirección IP 192.168.80.24 si estás accediendo de forma remota, o usa localhost si estás accediendo desde la misma máquina donde se ejecuta el servidor.
+   - Abre el archivo src/PersonService.js y asegúrate de que la URL del backend esté configurada correctamente:
 
-2. **Añadir Dependencias en pom.xml:**
+```javascript
 
-<!-- Asegúrate de que las siguientes dependencias estén presentes en tu archivo pom.xml: -->
+   import axios from 'axios';
 
-<dependencies>
-    <!-- Dependencia de Spring Web -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
+const API_URL = 'http://<IP_de_tu_PC_personal>:8080/api/persons';
 
-   <!-- Dependencia de Spring Data JPA -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
+class PersonService {
+  getPersons() {
+    return axios.get(API_URL);
+  }
 
-   <!-- Dependencia del Driver MySQL -->
-    <dependency>
-        <groupId>com.mysql</groupId>
-        <artifactId>mysql-connector-j</artifactId>
-        <scope>runtime</scope>
-    </dependency>
+  createPerson(person) {
+    return axios.post(API_URL, person);
+  }
 
-   <!-- Dependencia de Jakarta Persistence -->
-    <dependency>
-        <groupId>jakarta.persistence</groupId>
-        <artifactId>jakarta.persistence-api</artifactId>
-        <version>3.0.0</version>
-    </dependency>
+  updatePerson(id, person) {
+    return axios.put(`${API_URL}/${id}`, person);
+  }
 
-   <!-- Dependencia de Spring Boot DevTools (opcional) -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-devtools</artifactId>
-        <scope>runtime</scope>
-    </dependency>
+  deletePerson(id) {
+    return axios.delete(`${API_URL}/${id}`);
+  }
 
-   <!-- Dependencia de Spring Boot Test (opcional) -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
-
-3. **Actualizar el Proyecto Maven:**
-
-- Haz clic derecho en el proyecto en el explorador de proyectos.
-- Selecciona Maven > Update Project....
-- En la ventana que aparece, asegúrate de que tu proyecto esté seleccionado y haz clic en OK.
-
-4. **Limpiar y Reconstruir el Proyecto:**
-- Haz clic derecho en tu proyecto y selecciona Run As > Maven clean.
-- Luego, selecciona Run As > Maven install.
-
-### Crear las Entidades, Repositorios y Controladores
-
-1. **Entidad Person:**
-- Crea la clase Person en el paquete com.example.backend_meza.model:
-
-```java
-package com.example.backend_meza.model;
-
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.util.Date;
-
-@Entity
-@Table(name = "person")
-public class Person {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String nombre;
-    private String apellido;
-    private Date fechaNacimiento;
-    private String puesto;
-    private BigDecimal sueldo;
-
-    // Getters y Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public Date getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(Date fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public String getPuesto() {
-        return puesto;
-    }
-
-    public void setPuesto(String puesto) {
-        this.puesto = puesto;
-    }
-
-    public BigDecimal getSueldo() {
-        return sueldo;
-    }
-
-    public void setSueldo(BigDecimal sueldo) {
-        this.sueldo = sueldo;
-    }
+  getPersonById(id) {
+    return axios.get(`${API_URL}/${id}`);
+  }
 }
 
-2. **Repositorio PersonRepository:**
-- Crea la interfaz PersonRepository en el paquete com.example.backend_meza.repository:
+const personService = new PersonService();
+export default personService;
 
-```java
-package com.example.backend_backend_meza.repository;
+```
 
-import com.example.backend_backend_meza.model.Person;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+### Ejecutar la Aplicación
 
-@Repository
-public interface PersonRepository extends JpaRepository<Person, Long> {
+   1. **Iniciar el Servidor de Desarrollo React:**
+
+   - Ejecuta el siguiente comando para iniciar el servidor de desarrollo React:
+
+``` bash
+   npm start
+   ```
+   - Abre tu navegador y navega a http://localhost:3000 para ver la aplicación en funcionamiento.
+
+   ### Ejecutar la Aplicación
+    Asegúrate de que la estructura de tu proyecto se vea algo así:
+
+    frontend-meza/
+├── node_modules/
+├── public/
+├── src/
+│   ├── App.js
+│   ├── App.css
+│   ├── CreatePerson.js
+│   ├── EditPerson.js
+│   ├── ListPersons.js
+│   ├── PersonService.js
+│   ├── person.js
+│   ├── index.js
+│   └── ...
+├── package.json
+├── package-lock.json
+└── ...
+
+### Componentes Principales
+
+1. **App.js:**
+
+```javascript
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import ListPersons from './ListPersons';
+import CreatePerson from './CreatePerson';
+import EditPerson from './EditPerson';
+import './App.css'; // Importar los estilos globales
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <div className="container">
+          <Switch>
+            <Route exact path="/" component={ListPersons} />
+            <Route exact path="/persons" component={ListPersons} />
+            <Route exact path="/create" component={CreatePerson} />
+            <Route exact path="/edit/:id" component={EditPerson} />
+          </Switch>
+        </div>
+      </div>
+    </Router>
+  );
 }
 
-3. **Controlador PersonController:**
-- Crea la clase PersonController en el paquete com.example.backend_meza.controller:
+export default App;
+```
 
-```java
-package com.example.backend_backend_meza.controller;
+1. **App.css:**
 
-import com.example.backend_backend_meza.model.Person;
-import com.example.backend_backend_meza.repository.PersonRepository;
-import com.example.backend_backend_meza.Response;
-import com.example.backend_backend_meza.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+```css
 
-@RestController
-@RequestMapping("/api/persons")
-public class PersonController {
-    @Autowired
-    private PersonRepository personRepository;
-
-    @GetMapping
-    public ResponseEntity<?> getAllPersons() {
-        List<Person> persons = personRepository.findAll();
-        return ResponseEntity.ok(new Response(true, "Success", persons));
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createPerson(@RequestBody Person person) {
-        Person savedPerson = personRepository.save(person);
-        return ResponseEntity.ok(new Response(true, "Person created", savedPerson));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updatePerson(@PathVariable Long id, @RequestBody Person personDetails) {
-        Person person = personRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Person not found"));
-        person.setNombre(personDetails.getNombre());
-        person.setApellido(personDetails.getApellido());
-        person.setFechaNacimiento(personDetails.getFechaNacimiento());
-        person.setPuesto(personDetails.getPuesto());
-        person.setSueldo(personDetails.getSueldo());
-        final Person updatedPerson = personRepository.save(person);
-        return ResponseEntity.ok(new Response(true, "Person updated", updatedPerson));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePerson(@PathVariable Long id) {
-        Person person = personRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Person not found"));
-        personRepository.delete(person);
-        return ResponseEntity.ok(new Response(true, "Person deleted", null));
-    }
+/* App.css */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-4. **Clase Response:**
-- Crea la clase Response en el paquete com.example.backend_meza:
-
-```java
-package com.example.backend_backend_meza;
-
-public class Response {
-    private boolean status;
-    private String msg;
-    private Object data;
-
-    public Response(boolean status, String msg, Object data) {
-        this.status = status;
-        this.msg = msg;
-        this.data = data;
-    }
-
-    // Getters y Setters
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 800px;
 }
 
-5. **Clase `ResourceNotFoundException`:**
-   - Crea la clase `ResourceNotFoundException` en el paquete `com.example.backend_meza`:
+h2 {
+  text-align: center;
+  color: #333;
+}
 
-     ```java
-     package com.example.backend_backend_meza;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
 
-     import org.springframework.http.HttpStatus;
-     import org.springframework.web.bind.annotation.ResponseStatus;
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
 
-     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-     public class ResourceNotFoundException extends RuntimeException {
-         public ResourceNotFoundException(String message) {
-             super(message);
-         }
-     }
-     ```
+th {
+  background-color: #f2f2f2;
+}
 
-## Ejecutar la Aplicación
+button, input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
 
-1. **Iniciar la Aplicación:**
-   - Ejecuta la aplicación desde Spring Tool Suite 4. Haz clic derecho en el proyecto y selecciona `Run As` > `Spring Boot App`.
+button:hover, input[type="submit"]:hover {
+  background-color: #45a049;
+}
 
-## Probar el CRUD con Postman
+input[type="text"], input[type="date"], input[type="number"] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
 
-1. **Probar las Operaciones CRUD:**
-   - Abre Postman y crea las siguientes solicitudes para probar las operaciones CRUD:
+.actions {
+  display: flex;
+  justify-content: space-between;
+}
 
-   - **GET** `/api/persons`
-     - URL: `http://<localhost>:8080/api/persons`
-     - Descripción: Obtener todas las personas.
+.actions button {
+  background-color: #f44336;
+}
 
-   - **POST** `/api/persons`
-     - URL: `http://<localhost>:8080/api/persons`
-     - Body (JSON):
-       ```json
-       {
-           "nombre": "Juan",
-           "apellido": "Garcia",
-           "fechaNacimiento": "1990-01-01",
-           "puesto": "Desarrollador",
-           "sueldo": 50000.00
-       }
-       ```
-     - Descripción: Crear una nueva persona.
+.actions button:hover {
+  background-color: #e53935;
+}
 
-   - **PUT** `/api/persons/{id}`
-     - URL: `http://localhost:8080/api/persons/1`
-     - Body (JSON):
-       ```json
-       {
-           "nombre": "Juan",
-           "apellido": "Garcia",
-           "fechaNacimiento": "1990-01-01",
-           "puesto": "Desarrollador Senior",
-           "sueldo": 60000.00
-       }
-       ```
-     - Descripción: Actualizar una persona existente.
+.actions a {
+  text-decoration: none;
+  color: white;
+}
+```
 
-   - **DELETE** `/api/persons/{id}`
-     - URL: `http://localhost:8080/api/persons/1`
-     - Descripción: Eliminar una persona existente.
+3. **ListPersons.js:**
 
-## Subir el Código del Backend
+```javascript
+import React, { useState, useEffect } from 'react';
+import PersonService from './PersonService';
+import { Link } from 'react-router-dom';
 
-1. **Hacer Commit y Push:**
-   - Una vez que hayas probado y verificado que todo funciona correctamente, haz commit y push de los cambios al repositorio:
+const ListPersons = () => {
+  const [persons, setPersons] = useState([]);
 
-   ```bash
-   git add .
-   git commit -m "Add backend CRUD service"
-   git push origin meza_backend
+  useEffect(() => {
+    loadPersons();
+  }, []);
+
+  const loadPersons = async () => {
+    const result = await PersonService.getPersons();
+    setPersons(result.data.data);
+  };
+
+  const deletePerson = async (id) => {
+    await PersonService.deletePerson(id);
+    loadPersons();
+  };
+
+  return (
+    <div>
+      <h2>Lista de Personas</h2>
+      <div className="actions">
+        <Link to="/create">
+          <button>Crear Persona</button>
+        </Link>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Puesto</th>
+            <th>Sueldo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {persons.map((person) => (
+            <tr key={person.id}>
+              <td>{person.nombre}</td>
+              <td>{person.apellido}</td>
+              <td>{new Date(person.fechaNacimiento).toLocaleDateString()}</td>
+              <td>{person.puesto}</td>
+              <td>{person.sueldo}</td>
+              <td className="actions">
+                <Link to={`/edit/${person.id}`}>
+                  <button>Editar</button>
+                </Link>
+                <button onClick={() => deletePerson(person.id)}>Borrar</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default ListPersons;
+```
+
+4. **CreatePerson.js:**
+
+```javascript
+
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import PersonService from './PersonService';
+
+const CreatePerson = () => {
+  const [person, setPerson] = useState({
+    nombre: '',
+    apellido: '',
+    fechaNacimiento: '',
+    puesto: '',
+    sueldo: 0
+  });
+
+  const history = useHistory();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPerson({ ...person, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await PersonService.createPerson(person);
+    history.push('/persons');
+  };
+
+  return (
+    <div>
+      <h2>Crear Persona</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Nombre:</label>
+        <input type="text" name="nombre" value={person.nombre} onChange={handleChange} required />
+        <br />
+        <label>Apellido:</label>
+        <input type="text" name="apellido" value={person.apellido} onChange={handleChange} required />
+        <br />
+        <label>Fecha de Nacimiento:</label>
+        <input type="date" name="fechaNacimiento" value={person.fechaNacimiento} onChange={handleChange} required />
+        <br />
+        <label>Puesto:</label>
+        <input type="text" name="puesto" value={person.puesto} onChange={handleChange} required />
+        <br />
+        <label>Sueldo:</label>
+        <input type="number" name="sueldo" value={person.sueldo} onChange={handleChange} required />
+        <br />
+        <div className="actions">
+          <input type="submit" value="Guardar" />
+          <button type="button" onClick={() => history.push('/persons')}>Cancelar</button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default CreatePerson;
+```
+
+4. **EditPerson.js:**
+
+```javascript
+import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import PersonService from './PersonService';
+
+const EditPerson = () => {
+  const { id } = useParams();
+  const [person, setPerson] = useState({
+    nombre: '',
+    apellido: '',
+    fechaNacimiento: '',
+    puesto: '',
+    sueldo: 0
+  });
+
+  const history = useHistory();
+
+  const loadPerson = useCallback(async () => {
+    try {
+      const result = await PersonService.getPersonById(id);
+      setPerson(result.data.data);
+    } catch (error) {
+      console.error("Error loading person:", error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    loadPerson();
+  }, [loadPerson]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPerson({ ...person, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await PersonService.updatePerson(id, person);
+      history.push('/persons');
+    } catch (error) {
+      console.error("Error updating person:", error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Editar Persona</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Nombre:</label>
+        <input type="text" name="nombre" value={person.nombre} onChange={handleChange} required />
+        <br />
+        <label>Apellido:</label>
+        <input type="text" name="apellido" value={person.apellido} onChange={handleChange} required />
+        <br />
+        <label>Fecha de Nacimiento:</label>
+        <input type="date" name="fechaNacimiento" value={person.fechaNacimiento} onChange={handleChange} required />
+        <br />
+        <label>Puesto:</label>
+        <input type="text" name="puesto" value={person.puesto} onChange={handleChange} required />
+        <br />
+        <label>Sueldo:</label>
+        <input type="number" name="sueldo" value={person.sueldo} onChange={handleChange} required />
+        <br />
+        <div className="actions">
+          <input type="submit" value="Guardar" />
+          <button type="button" onClick={() => history.push('/persons')}>Cancelar</button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default EditPerson;
+```
+
+5. **PersonService.js:**
+
+```javascript
+import axios from 'axios';
+
+const API_URL = 'http://<IP_de_tu_PC_personal>:8080/api/persons';
+
+class PersonService {
+  getPersons() {
+    return axios.get(API_URL);
+  }
+
+  createPerson(person) {
+    return axios.post(API_URL, person);
+  }
+
+  updatePerson(id, person) {
+    return axios.put(`${API_URL}/${id}`, person);
+  }
+
+  deletePerson(id) {
+    return axios.delete(`${API_URL}/${id}`);
+  }
+
+  getPersonById(id) {
+    return axios.get(`${API_URL}/${id}`);
+  }
+}
+
+const personService = new PersonService();
+export default personService;
+```
+
+6. **person.js:**
+
+```javascript
+
+export interface Person {
+  id?: number;
+  nombre: string;
+  apellido: string;
+  fechaNacimiento: string;
+  puesto: string;
+  sueldo: number;
+}
+```
+
+7. **index.js:**
+
+```javascript
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+```
